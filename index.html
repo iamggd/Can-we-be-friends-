@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>For You 🌸</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lato:wght@300;400&display=swap');
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #1a0a2e 0%, #2d0a4e 40%, #1a0a2e 100%);
+      font-family: 'Lato', sans-serif;
+      overflow: hidden;
+      position: relative;
+    }
+
+    #stars-canvas {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .petal {
+      position: fixed;
+      font-size: 1.2rem;
+      pointer-events: none;
+      z-index: 1;
+      animation: fall linear infinite;
+      opacity: 0.7;
+    }
+    @keyframes fall {
+      0%   { transform: translateY(-40px) rotate(0deg); opacity: 0.8; }
+      100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
+    }
+
+    .screen {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+    .screen.hidden {
+      opacity: 0;
+      pointer-events: none;
+      transform: scale(0.95);
+    }
+
+    /* Welcome */
+    #welcome-screen .envelope {
+      font-size: 5rem;
+      animation: float 3s ease-in-out infinite;
+      cursor: pointer;
+      filter: drop-shadow(0 0 20px #ff69b4aa);
+    }
+    @keyframes float {
+      0%,100% { transform: translateY(0px) rotate(-3deg); }
+      50%      { transform: translateY(-18px) rotate(3deg); }
+    }
+    #welcome-screen h1 {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      color: #ffb3d9;
+      font-size: clamp(1.6rem, 4vw, 2.6rem);
+      margin-top: 1.5rem;
+      text-align: center;
+      text-shadow: 0 0 30px #ff69b4;
+      padding: 0 1rem;
+    }
+    #welcome-screen p {
+      color: #e8c4f0;
+      margin-top: 0.8rem;
+      font-size: 1rem;
+      letter-spacing: 0.08em;
+      opacity: 0.8;
+    }
+    #open-btn {
+      margin-top: 2.5rem;
+      padding: 0.8rem 2.5rem;
+      background: linear-gradient(135deg, #ff69b4, #c41e8a);
+      border: none;
+      border-radius: 50px;
+      color: white;
+      font-size: 1rem;
+      letter-spacing: 0.1em;
+      cursor: pointer;
+      box-shadow: 0 0 25px #ff69b490;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    #open-btn:hover {
+      transform: scale(1.07);
+      box-shadow: 0 0 40px #ff69b4cc;
+    }
+
+    /* Letter */
+    #letter-screen .letter-card {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,182,193,0.3);
+      border-radius: 20px;
+      padding: 2.5rem 3rem;
+      max-width: 480px;
+      width: 90%;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 0 60px rgba(255,105,180,0.2);
+      text-align: center;
+    }
+    .letter-card .rose { font-size: 2.5rem; margin-bottom: 1rem; }
+    .letter-card h2 {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      color: #ffb3d9;
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+      line-height: 1.5;
+    }
+    .letter-card p {
+      color: #ddc4f0;
+      font-size: 0.95rem;
+      line-height: 1.8;
+      opacity: 0.9;
+    }
+    #next-btn {
+      margin-top: 2rem;
+      padding: 0.7rem 2.2rem;
+      background: transparent;
+      border: 1.5px solid #ff69b4;
+      border-radius: 50px;
+      color: #ffb3d9;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    #next-btn:hover {
+      background: #ff69b430;
+      box-shadow: 0 0 20px #ff69b450;
+    }
+
+    /* Question */
+    #question-screen .question-card {
+      text-align: center;
+      padding: 2rem;
+    }
+    .question-card .icon { font-size: 3.5rem; margin-bottom: 1.2rem; animation: pulse 2s infinite; }
+    @keyframes pulse {
+      0%,100% { transform: scale(1); }
+      50%      { transform: scale(1.12); }
+    }
+    .question-card h2 {
+      font-family: 'Playfair Display', serif;
+      color: #ffb3d9;
+      font-size: clamp(1.8rem, 5vw, 2.8rem);
+      text-shadow: 0 0 20px #ff69b4;
+      margin-bottom: 0.5rem;
+    }
+    .question-card .sub {
+      color: #e0c4f0;
+      font-size: 0.9rem;
+      opacity: 0.7;
+      margin-bottom: 2.5rem;
+    }
+
+    .btn-wrap {
+      display: flex;
+      gap: 1.5rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    #yes-btn {
+      padding: 0.85rem 2.8rem;
+      background: linear-gradient(135deg, #ff69b4, #c41e8a);
+      border: none;
+      border-radius: 50px;
+      color: white;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 0 30px #ff69b480;
+      transition: transform 0.3s, box-shadow 0.3s;
+      letter-spacing: 0.05em;
+      z-index: 15;
+    }
+    #yes-btn:hover {
+      transform: scale(1.1);
+      box-shadow: 0 0 50px #ff69b4cc;
+    }
+
+    #no-btn {
+      padding: 0.85rem 2.8rem;
+      background: transparent;
+      border: 1.5px solid rgba(255,100,150,0.4);
+      border-radius: 50px;
+      color: #ffb3d9;
+      font-size: 1rem;
+      cursor: pointer;
+      position: fixed;
+      transition: font-size 0.2s;
+      z-index: 20;
+      white-space: nowrap;
+    }
+
+    /* Yes screen */
+    #yes-screen { text-align: center; }
+    #yes-screen .yay { font-size: 4rem; animation: bounce 0.6s infinite alternate; }
+    @keyframes bounce {
+      from { transform: translateY(0); }
+      to   { transform: translateY(-15px); }
+    }
+    #yes-screen h2 {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      color: #ffb3d9;
+      font-size: clamp(1.8rem, 5vw, 3rem);
+      margin: 1.2rem 0 0.8rem;
+      text-shadow: 0 0 30px #ff69b4;
+      padding: 0 1rem;
+    }
+    #yes-screen p {
+      color: #e0c4f0;
+      font-size: 1rem;
+      opacity: 0.85;
+      max-width: 360px;
+      line-height: 1.7;
+      padding: 0 1rem;
+    }
+    #heart-rain { position: fixed; inset: 0; pointer-events: none; z-index: 5; }
+  </style>
+</head>
+<body>
+
+<canvas id="stars-canvas"></canvas>
+<div id="heart-rain"></div>
+
+<!-- Screen 1: Welcome -->
+<div class="screen" id="welcome-screen">
+  <div class="envelope">💌</div>
+  <h1>Someone has a message for you…</h1>
+  <p>tap to open</p>
+  <button id="open-btn">Open the letter ✨</button>
+</div>
+
+<!-- Screen 2: Letter -->
+<div class="screen hidden" id="letter-screen">
+  <div class="letter-card">
+    <div class="rose">🌹</div>
+    <h2>"There are some people who make the world a little brighter just by being in it."</h2>
+    <p>
+      You're one of those people.<br/><br/>
+      Every time I see you, I find myself smiling for no reason.
+      You have this quiet magic about you — the kind that's hard to explain,
+      but impossible to ignore.<br/><br/>
+      So I gathered every bit of courage I have…
+      and I have something important to ask you. 🌸
+    </p>
+    <button id="next-btn">I'm ready →</button>
+  </div>
+</div>
+
+<!-- Screen 3: Question -->
+<div class="screen hidden" id="question-screen">
+  <div class="question-card">
+    <div class="icon">🥺</div>
+    <h2>Can we be friends?</h2>
+    <p class="sub">(maybe even more than friends someday...)</p>
+    <div class="btn-wrap">
+      <button id="yes-btn">Yes! 💕</button>
+      <button id="no-btn">No 🙈</button>
+    </div>
+  </div>
+</div>
+
+<!-- Screen 4: Yes -->
+<div class="screen hidden" id="yes-screen">
+  <div class="yay">🎉</div>
+  <h2>She said YES!! 💖</h2>
+  <p>You just made someone the happiest person in the world right now. This is only the beginning of something truly beautiful. 🌹✨</p>
+</div>
+
+<script>
+  /* Starfield */
+  const canvas = document.getElementById('stars-canvas');
+  const ctx = canvas.getContext('2d');
+  let stars = [];
+  function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  function initStars() {
+    stars = Array.from({length: 160}, () => ({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      r: Math.random() * 1.4 + 0.3,
+      a: Math.random(),
+      speed: Math.random() * 0.008 + 0.003
+    }));
+  }
+  function drawStars() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    stars.forEach(s => {
+      s.a += s.speed;
+      const alpha = 0.4 + 0.6 * Math.abs(Math.sin(s.a));
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(255,220,240,${alpha})`;
+      ctx.fill();
+    });
+    requestAnimationFrame(drawStars);
+  }
+  resizeCanvas(); initStars(); drawStars();
+  window.addEventListener('resize', () => { resizeCanvas(); initStars(); });
+
+  /* Falling petals */
+  const petals = ['🌸','🌺','✨','💮','🌷'];
+  function spawnPetal() {
+    const el = document.createElement('div');
+    el.className = 'petal';
+    el.textContent = petals[Math.floor(Math.random() * petals.length)];
+    el.style.left = Math.random() * 100 + 'vw';
+    el.style.fontSize = (Math.random() * 0.8 + 0.8) + 'rem';
+    const dur = Math.random() * 6 + 6;
+    el.style.animationDuration = dur + 's';
+    el.style.animationDelay = Math.random() * 4 + 's';
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), (dur + 5) * 1000);
+  }
+  setInterval(spawnPetal, 600);
+  for(let i=0;i<8;i++) spawnPetal();
+
+  /* Screen transitions */
+  function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
+    document.getElementById(id).classList.remove('hidden');
+  }
+
+  document.getElementById('open-btn').addEventListener('click', () => showScreen('letter-screen'));
+  document.getElementById('next-btn').addEventListener('click', () => {
+    showScreen('question-screen');
+    setTimeout(positionNoBtn, 50);
+  });
+
+  document.getElementById('yes-btn').addEventListener('click', () => {
+    showScreen('yes-screen');
+    startHeartRain();
+  });
+
+  /* NO button — runs away */
+  const noBtn = document.getElementById('no-btn');
+  let noClickCount = 0;
+
+  function positionNoBtn() {
+    const wrap = document.querySelector('.btn-wrap');
+    const rect = wrap.getBoundingClientRect();
+    noBtn.style.top  = rect.top + 'px';
+    noBtn.style.left = (rect.right - noBtn.offsetWidth) + 'px';
+  }
+
+  function getRandomPos() {
+    const margin = 40;
+    const w = noBtn.offsetWidth  || 120;
+    const h = noBtn.offsetHeight || 50;
+    const maxX = window.innerWidth  - w - margin;
+    const maxY = window.innerHeight - h - margin;
+    return {
+      x: margin + Math.random() * maxX,
+      y: margin + Math.random() * maxY
+    };
+  }
+
+  function moveNoBtn() {
+    noClickCount++;
+    const pos = getRandomPos();
+    noBtn.style.left = pos.x + 'px';
+    noBtn.style.top  = pos.y + 'px';
+
+    const labels = ['No 🙈','Nope 😅','Please no 😬','Catch me! 🏃','Never! 😤','lol no 💨','Stop! 🛑','hehe no~ 🙊','Too slow! 😂','Give up? 🤭'];
+    noBtn.textContent = labels[Math.min(noClickCount - 1, labels.length - 1)];
+
+    const yesBtn = document.getElementById('yes-btn');
+    const scale = Math.min(1 + noClickCount * 0.12, 2.2);
+    yesBtn.style.transform = `scale(${scale})`;
+    yesBtn.style.boxShadow = `0 0 ${30 + noClickCount * 10}px #ff69b4cc`;
+  }
+
+  noBtn.addEventListener('click', moveNoBtn);
+  noBtn.addEventListener('mouseenter', moveNoBtn);
+
+  /* Heart rain */
+  function startHeartRain() {
+    const container = document.getElementById('heart-rain');
+    const emojis = ['💖','💕','💗','💓','💝','✨','🌸','💞','🎊','🥳'];
+    for(let i=0;i<80;i++){
+      setTimeout(() => {
+        const h = document.createElement('div');
+        h.style.cssText = `
+          position:absolute;
+          left:${Math.random()*100}vw;
+          top:-40px;
+          font-size:${Math.random()*1.5+1}rem;
+          animation: fall ${Math.random()*3+2}s linear forwards;
+          pointer-events:none;
+        `;
+        h.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+        container.appendChild(h);
+        setTimeout(()=>h.remove(), 6000);
+      }, i * 60);
+    }
+  }
+</script>
+</body>
+</html>
